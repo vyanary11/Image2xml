@@ -16,10 +16,10 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import XMLViewer from 'react-xml-viewer'
-
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+import {CopyToClipboard} from 'react-copy-to-clipboard';
  
 export default class ImageOps extends React.Component {
    
@@ -80,16 +80,31 @@ export default class ImageOps extends React.Component {
                     <div style={heroContent}>
                         <Container maxWidth="xl">
                             <Grid container spacing={3} justify="center">
-                                {this.state.image_object &&
-                                    <Grid item xs={6}>
-                                        <Card>
-                                            <CardHeader title="Image" />
-                                            <CardContent>
-                                                <img src={this.state.image_object} alt="" height="450px"/>
-                                            </CardContent>
-                                        </Card>
-                                    </Grid>    
-                                }
+                                <Grid item xs={6}>
+                                    <Card>
+                                        <CardHeader title="Image" />
+                                        <CardContent>
+                                            <Grid container spacing={2} justify="center">
+                                                <Grid item>
+                                                    <Button variant="contained" component='label'>
+                                                        Upload Image
+                                                        <input accept="image/png,image/jpeg" onChange={(e) =>  this.updateImageObject(e)} type="file" style={{ display: 'none' }} />
+                                                    </Button>
+                                                </Grid>
+                                                {this.state.image_object && <Grid item>
+                                                    <Button onClick={() => this.processImageObject('test')} variant="contained" color="primary">
+                                                        Prosess
+                                                    </Button>
+                                                </Grid>}
+                                                <Grid item xs={12}>
+                                                    {this.state.image_object &&
+                                                        <img src={this.state.image_object} alt="" height="600px"/>
+                                                    }
+                                                </Grid>
+                                            </Grid>
+                                        </CardContent>
+                                    </Card>
+                                </Grid>    
                                 {this.state.active_type && this.state.image_object_details[this.state.active_type] &&
                                     <Grid item xs={6}>
                                         <Card>
@@ -112,25 +127,6 @@ export default class ImageOps extends React.Component {
                                         </Card>        
                                     </Grid>
                                 }  
-                                <Grid item xs={12}>
-                                    <Card>
-                                        <CardContent>
-                                            <Grid container spacing={2} justify="center">
-                                                <Grid item>
-                                                    <Button variant="contained" component='label'>
-                                                        Upload Image
-                                                        <input accept="image/png,image/jpeg" onChange={(e) =>  this.updateImageObject(e)} type="file" style={{ display: 'none' }} />
-                                                    </Button>
-                                                </Grid>
-                                                {this.state.image_object && <Grid item>
-                                                    <Button onClick={() => this.processImageObject('test')} variant="contained" color="primary">
-                                                        Prosess
-                                                    </Button>
-                                                </Grid>}
-                                            </Grid>
-                                        </CardContent>
-                                    </Card>
-                                </Grid>  
                             </Grid>
                         </Container>
                     </div>
@@ -141,7 +137,18 @@ export default class ImageOps extends React.Component {
 }
  
 class ImageDetails extends React.Component {
-  
+    download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:Text/xml;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+    
+        element.style.display = 'none';
+        document.body.appendChild(element);
+    
+        element.click();
+    
+        document.body.removeChild(element);
+    }
     render() {
         var jsonxml = require('jsontoxml');
         var xml = jsonxml([{
@@ -159,22 +166,31 @@ class ImageDetails extends React.Component {
         console.log(xml);
         const resultXML = {
             textAlign : "left",
-            whiteSpace: "pre-wrap"
         };
         return (
             <div style={resultXML}>
                 <Grid container spacing={2} justify="center">
                     <Grid item xs={12}>
-                        <SyntaxHighlighter useInlineStyles={true} showLineNumbers={true} wrapLines={true} language="xml" style={tomorrow}>
+                        <Grid container spacing={2} justify="center">
+                            <Grid item>
+                                <Button variant="contained" color="primary" onClick={() => this.download('s2code.xml',xml)}>
+                                    Download File xml
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <CopyToClipboard text={xml}>
+                                    <Button variant="contained" color="secondary" onClick={() => alert("Copied")}>
+                                        Copy To Clipboard
+                                    </Button>
+                                </CopyToClipboard>
+                            </Grid>
+                        </Grid>
+                    </Grid>    
+                    <Grid item xs={12}>
+                        <SyntaxHighlighter showLineNumbers={true} language="xml" style={tomorrow}>
                             {xml}
                         </SyntaxHighlighter>
-                        {/* <XMLViewer xml={xml} indentSize={4} /> */}
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button variant="contained" color="primary" onClick={() => alert('Downloding.....')}>
-                            Download File xml
-                        </Button>
-                    </Grid>    
+                    </Grid> 
                 </Grid>
             </div>
         )
