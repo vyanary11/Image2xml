@@ -17,6 +17,9 @@ import Toolbar from '@material-ui/core/Toolbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import XMLViewer from 'react-xml-viewer'
+
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
  
 export default class ImageOps extends React.Component {
    
@@ -162,7 +165,10 @@ class ImageDetails extends React.Component {
             <div style={resultXML}>
                 <Grid container spacing={2} justify="center">
                     <Grid item xs={12}>
-                        <XMLViewer xml={xml} indentSize={4} />
+                        <SyntaxHighlighter useInlineStyles={true} showLineNumbers={true} wrapLines={true} language="xml" style={tomorrow}>
+                            {xml}
+                        </SyntaxHighlighter>
+                        {/* <XMLViewer xml={xml} indentSize={4} /> */}
                     </Grid>
                     <Grid item xs={12}>
                         <Button variant="contained" color="primary" onClick={() => alert('Downloding.....')}>

@@ -31,102 +31,7 @@ MODEL_DETECT_PATH = dir_path + '/model/frozen_inference_graph.pb'
 # Utilities
 ##################################################
 
-def mappingJSONCodeXML(label):
-    if(label=='toolbar'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
 
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-    elif(label=='switch'):
-        dataJson={
-            'name'  : 'Toolbar',
-            'attrs' : [
-
-            ]
-        }
-
-    dataArray.append(dataJson)
-    
-    return dataArray
 
 # Membaca classes
 def getLabel(index):
@@ -265,7 +170,7 @@ def getJSONdata(scores, num, predictions_det, prediction_boxes_det):
             }
             jsonWithHorizontalArray.append(jsonWithHorizontal)
             horizontalFind=False
-
+    print(jsonWithHorizontalArray)
     #Menyederhanakan JSON dan mapping json android
     jsonForXMLArray=[]
     jsonVerticalArray={}
