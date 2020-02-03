@@ -20,6 +20,11 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import {CopyToClipboard} from 'react-copy-to-clipboard';
+
+import { saveAs } from 'file-saver';
+var JSZip = require("jszip");
+var fs = require("fs");
+var stream = fs.createReadStream;
  
 export default class ImageOps extends React.Component {
    
@@ -137,17 +142,20 @@ export default class ImageOps extends React.Component {
 }
  
 class ImageDetails extends React.Component {
-    download(filename, text) {
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:Text/xml;charset=utf-8,' + encodeURIComponent(text));
-        element.setAttribute('download', filename);
-    
-        element.style.display = 'none';
-        document.body.appendChild(element);
-    
-        element.click();
-    
-        document.body.removeChild(element);
+    download(dataxml,hasNavigationButton){
+        var zip = new JSZip();
+        var res = zip.folder("res");
+        var layout = res.folder("layout");
+        layout.file("layout_generate.xml", dataxml);
+
+        if(hasNavigationButton===true){
+            zip.file("favicon.ico", stream);
+        }
+        
+        zip.generateAsync({type:"blob"}).then(function(content) {
+            // see FileSaver.js
+            saveAs(content, "res.zip");
+        });
     }
     render() {
         var jsonxml = require('jsontoxml');
@@ -173,7 +181,7 @@ class ImageDetails extends React.Component {
                     <Grid item xs={12}>
                         <Grid container spacing={2} justify="center">
                             <Grid item>
-                                <Button variant="contained" color="primary" onClick={() => this.download('s2code.xml',xml)}>
+                                <Button variant="contained" color="primary" onClick={() => this.download(xml,true)}>
                                     Download File xml
                                 </Button>
                             </Grid>
