@@ -1,12 +1,12 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import ImageOps from './container/ImageOps';
+import ImageProses from './container/ImageProses';
 
 function App() {
   return (
     <div className="App">
-      <ImageOps />
+      <ImageProses />
     </div>
   );
 }

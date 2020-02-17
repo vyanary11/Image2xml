@@ -16,25 +16,20 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import ImageDetail from '../component/ImageDetail';
 
-import {CopyToClipboard} from 'react-copy-to-clipboard';
-
-import { saveAs } from 'file-saver';
-var JSZip = require("jszip");
-var fs = require("fs");
-var stream = fs.createReadStream;
  
-export default class ImageOps extends React.Component {
+export default class ImageProses extends React.Component {
    
     constructor(props) {
        super(props);
  
        this.state = {
-           image_object: null,
-           image_object_details: {},
-           active_type: null
+            hasNavigationButton:false,
+            hasFloatingnButton:false, 
+            image_object: null,
+            image_object_details: {},
+            status_proses: false
        }
    }
  
@@ -44,28 +39,31 @@ export default class ImageOps extends React.Component {
       
        reader.readAsDataURL(file);
        reader.onload = () => {
-           this.setState({image_object: reader.result, image_object_details: {}, active_type: null});
+           this.setState({
+                hasNavigationButton:false,
+                hasFloatingnButton:false,
+                image_object: reader.result, 
+                image_object_details: null, 
+                status_proses: false
+            });
        };
  
    }
  
-   processImageObject(type) {
- 
-       this.setState({active_type: type}, () => {
- 
-           if(!this.state.image_object_details[this.state.active_type]) {
-               api("detect_image_objects", this.state.image_object).then((response) => {
-                  
-                   const filtered_data = response;
-                   const image_details = this.state.image_object_details;
-      
-                   image_details[filtered_data.type] = filtered_data.data;
+    getDataFromServer() {
 
-                   this.setState({image_object_details: image_details });
-               });
-           }
-       });
-   }
+        this.setState({status_proses: true, image_object_details:null}, () => {
+ 
+            api("detect_image_objects", this.state.image_object).then((response) => {
+                this.setState({
+                    hasNavigationButton     : response.hasNavigationButton,
+                    hasFloatingnButton      : response.hasFloatingnButton,
+                    image_object_details    : response.data 
+                });
+            });
+        
+        });
+    }
  
     render() {
         const heroContent = {
@@ -97,7 +95,7 @@ export default class ImageOps extends React.Component {
                                                     </Button>
                                                 </Grid>
                                                 {this.state.image_object && <Grid item>
-                                                    <Button onClick={() => this.processImageObject('test')} variant="contained" color="primary">
+                                                    <Button onClick={() => this.getDataFromServer()} variant="contained" color="primary">
                                                         Prosess
                                                     </Button>
                                                 </Grid>}
@@ -110,17 +108,17 @@ export default class ImageOps extends React.Component {
                                         </CardContent>
                                     </Card>
                                 </Grid>    
-                                {this.state.active_type && this.state.image_object_details[this.state.active_type] &&
+                                {this.state.status_proses && this.state.image_object_details &&
                                     <Grid item xs={6}>
                                         <Card>
                                             <CardHeader title="Result" />
                                             <CardContent>
-                                                <ImageDetails type={this.state.active_type} data = {this.state.image_object_details[this.state.active_type]}></ImageDetails>
+                                                <ImageDetail data = {this.state.image_object_details} hasNavigationButton = {this.state.hasNavigationButton} hasFloatingnButton = {this.state.hasFloatingnButton}></ImageDetail>
                                             </CardContent>
                                         </Card>
                                     </Grid>
                                 }
-                                {this.state.active_type && !this.state.image_object_details[this.state.active_type] &&
+                                {this.state.status_proses && !this.state.image_object_details &&
                                     <Grid item xs={6}>
                                         <Card>
                                             <CardHeader title="Loading....." />
@@ -139,69 +137,4 @@ export default class ImageOps extends React.Component {
             </div>
         )
     }
-}
- 
-class ImageDetails extends React.Component {
-    download(dataxml,hasNavigationButton){
-        var zip = new JSZip();
-        var res = zip.folder("res");
-        var layout = res.folder("layout");
-        layout.file("layout_generate.xml", dataxml);
-
-        if(hasNavigationButton===true){
-            zip.file("favicon.ico", stream);
-        }
-        
-        zip.generateAsync({type:"blob"}).then(function(content) {
-            // see FileSaver.js
-            saveAs(content, "res.zip");
-        });
-    }
-    render() {
-        var jsonxml = require('jsontoxml');
-        var xml = jsonxml([{
-            name    : 'RelativeLayout',
-            attrs   : {
-                'xmlns:android' : "http://schemas.android.com/apk/res/android",
-                'xmlns:app' : "http://schemas.android.com/apk/res-auto",
-                'xmlns:tools' : "http://schemas.android.com/tools",
-                'android:layout_width' : "match_parent",
-                'android:layout_height' : "match_parent",
-            },
-            children: this.props.data
-        }],{xmlHeader:true, prettyPrint:true});
-        console.log(this.props.data);
-        console.log(xml);
-        const resultXML = {
-            textAlign : "left",
-        };
-        return (
-            <div style={resultXML}>
-                <Grid container spacing={2} justify="center">
-                    <Grid item xs={12}>
-                        <Grid container spacing={2} justify="center">
-                            <Grid item>
-                                <Button variant="contained" color="primary" onClick={() => this.download(xml,true)}>
-                                    Download File xml
-                                </Button>
-                            </Grid>
-                            <Grid item>
-                                <CopyToClipboard text={xml}>
-                                    <Button variant="contained" color="secondary" onClick={() => alert("Copied")}>
-                                        Copy To Clipboard
-                                    </Button>
-                                </CopyToClipboard>
-                            </Grid>
-                        </Grid>
-                    </Grid>    
-                    <Grid item xs={12}>
-                        <SyntaxHighlighter showLineNumbers={true} language="xml" style={tomorrow}>
-                            {xml}
-                        </SyntaxHighlighter>
-                    </Grid> 
-                </Grid>
-            </div>
-        )
-    }
-}
- 
+} 
