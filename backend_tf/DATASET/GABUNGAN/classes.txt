@@ -1,0 +1,15 @@
+toolbar
+switch
+textView
+slider
+slider1
+radioButton
+navigationButton
+button
+buttonImage
+buttonIcon
+imageView
+checkBox
+ratingBar
+editText
+floatingButton
